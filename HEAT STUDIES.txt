@@ -1,0 +1,142 @@
+==========================================================================================================================================================
+HEAT ORCHESTRATION SERVICE:
+==========================================================================================================================================================
+Heat is a openstack orchestration service and its goal is to help openstack users model,
+setup and automate the creation and management of openstack resource.
+
+About Heat:
+-----------
+Heat was introduced in april 2013 with the grizzly version of openstack. like cloud formation, heat begins with the blue print or
+heat orchestration template that describes all the openstack resources to be provisioned. Heat takes care of provisioning and configuring with 
+no need to worry about dependancies or the order of execution.
+you can delete the stack just as easily, which deletes all the resources associated with the stack.
+if u want to make any changes to the you can even easily update it by providing a modified template with new parameters.
+
+Heat Architecture:
+------------------
+1.Heat-API:The API and primary gateway to Heat. one must to interact with heat-api to create,list,delete, and manages stacks
+-----------
+2.Heat-Apn-Cfn: This Provides an AWS-Style Query API that allows services or human users to utilize  cloudformation-like such as functionalities
+--------------- such as wait conditions and triggering autoscaling.
+
+3.Heat-Engine: This is responsible for launching stacks and managing all resources specified in the template. 
+---------------
+
+Heat Templates:
+----------------
+HeatTemplates [ heat orchestration templates or HOT ] are templates that heat-api can consume to create virtual resources and their associated parameters.
+after stack is created the openstack resources are up and running. Templates are extremely convenient because they allow you to check them into a version 
+control system such as GITHUB to easily track changes and collaborate with the team.if problem occurs after deploying a heat template, simply restore to a 
+previous version of the template.
+
+
+Anatomy of a Heat Template:
+---------------------------
+heat_template_version: 2013-05-23     ------------------->(1)template Header: -version corresponds with openstack version 
+description: test stack
+
+parameters:                           ------------------->(2)Parameters: -specify any input parameters
+ ServerName:
+    type: string
+	description: Image ID used to boot the server
+	
+ Image: 
+    type: string
+	description: Image name of server
+	
+ Flavor:
+   type: string
+   description: Flavor of ServerName
+ 
+ Net: 
+   type: string
+   description: network ID for a Server
+  
+ Volume:
+   type: string
+   description: A volume ID for the server.
+   
+resources:                            ----------------->(3)Resources: -Openstack resources you are creating (mandatory)
+  server:
+    type: OS:: Nova::Server
+	properties:
+	  name: { get_param: ServerName }
+	  image: { get_param: image }
+	  flavor: { get_param: flavor }
+	  networks:
+	    - network: { get_param: Net }
+		
+Volumeattach:
+
+ type: OS:: Cinder::Volumeattachment
+ properties:
+   volume_id: { get_param: volume }
+   instance_uuid: { get_resource: server1 }
+
+outputs:                            ----------------------->(4)outputs: info provided to a user after the stacks has created ie: ip,URLS,UUIDS,PASSWDS etc
+
+  myinstance_ip:
+    description: ip of the first instance
+	value: { get_attr: [ sever1, first_address] }
+	
+1.Template Header: 
+-------------------
+The template version is mandatory and the description is optional. additional features and capabilities are released in every new version    
+of openstack. this means that newer templates that users create may reference features not found in older versions.
+Examples: 
+---------
+Heat Template Versions:     Openstack Versions:
+-----------------------   ----------------------
+2013-05-23                grizzly,havana,icehouse and higher
+2014-10-16                juno and higher
+2015-04-30                kilo and higher 
+2013-10-15                liberty and higher 
+2016-04-08                mitaka and higher
+
+2.Parameters:
+-------------
+These are optional and can be any particular value you'd like the user to be able to insert. these values are get passed in by the user at the time of 
+deploying or creating the stack.
+
+3.Resource:
+-----------
+These are mandotory and represent any openstack resource you want to create.
+
+4.Outputs:
+----------
+Information provided  to the user after stack creation.
+this could be anything from an IP address to a specific registration code or passwd.
+========================================================================================================================================================================================================================================================================================================
+YAML ( YAML Aint Markup language) is a subset of JSON and makes setting values easier for humans. tabs are not allowed in YAML so always be sure 
+to use spaces. All properties and lists must be indented with 1 or more space. if you a stuggle with the template.
+========================================================================================================================================================================================================================================================================================================
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
